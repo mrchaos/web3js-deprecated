@@ -20,11 +20,12 @@ interface MintTxs {
 export async function prepareTokenAccountAndMintTxs(
   connection: Connection,
   owner: PublicKey,
+  feePayer?: PublicKey
 ): Promise<MintTxs> {
   const mint = Keypair.generate();
   const mintRent = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
   const createMintTx = new CreateMint(
-    { feePayer: owner },
+    { feePayer: feePayer===undefined ? owner : feePayer },
     {
       newAccountPubkey: mint.publicKey,
       lamports: mintRent,
@@ -39,7 +40,7 @@ export async function prepareTokenAccountAndMintTxs(
   );
 
   const createAssociatedTokenAccountTx = new CreateAssociatedTokenAccount(
-    { feePayer: owner },
+    { feePayer: feePayer===undefined ? owner : feePayer },
     {
       associatedTokenAddress: recipient,
       splTokenMintAddress: mint.publicKey,
@@ -47,7 +48,7 @@ export async function prepareTokenAccountAndMintTxs(
   );
 
   const mintToTx = new MintTo(
-    { feePayer: owner },
+    { feePayer: feePayer===undefined ? owner : feePayer },
     {
       mint: mint.publicKey,
       dest: recipient,

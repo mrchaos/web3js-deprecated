@@ -107,7 +107,7 @@
     "rollup-plugin-visualizer": "^5.5.2",
     "semantic-release": "^18.0.0",
     "ts-jest": "^27.0.5",
-    "ts-node": "^10.2.1",
+    "ts-node": "^10.9.1",
     "ttypescript": "^1.5.12",
     "typedoc": "^0.22.3",
     "typescript": "^4.4.3"
@@ -121,5 +121,8 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "resolutions": {
+    "@holaplex/ui": "portal:/home/shpark/solana/mrchaos/metaplex/holaplex-minter"
   }
 }

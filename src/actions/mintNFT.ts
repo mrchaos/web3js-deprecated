@@ -23,6 +23,7 @@ export interface MintNFTParams {
   uri: string;
   /** Maximum supply of limited edition prints that can be created from the master edition of the minted NFT **/
   maxSupply?: number;
+  feePayer?: PublicKey;
 }
 
 export interface MintNFTResponse {
@@ -37,9 +38,11 @@ export const mintNFT = async ({
   wallet,
   uri,
   maxSupply,
+  feePayer
 }: MintNFTParams): Promise<MintNFTResponse> => {
   const { mint, createMintTx, createAssociatedTokenAccountTx, mintToTx } =
-    await prepareTokenAccountAndMintTxs(connection, wallet.publicKey);
+  feePayer === undefined ?  await prepareTokenAccountAndMintTxs(connection, wallet.publicKey)
+                         :  await prepareTokenAccountAndMintTxs(connection, wallet.publicKey,feePayer);
 
   const metadataPDA = await Metadata.getPDA(mint.publicKey);
   const editionPDA = await MasterEdition.getPDA(mint.publicKey);
@@ -74,9 +77,7 @@ export const mintNFT = async ({
   });
 
   const createMetadataTx = new CreateMetadata(
-    {
-      feePayer: wallet.publicKey,
-    },
+    { feePayer: feePayer === undefined ? wallet.publicKey : feePayer }, // MrChaos
     {
       metadata: metadataPDA,
       metadataData,
@@ -87,7 +88,7 @@ export const mintNFT = async ({
   );
 
   const masterEditionTx = new CreateMasterEdition(
-    { feePayer: wallet.publicKey },
+    { feePayer: feePayer === undefined ? wallet.publicKey : feePayer }, // MrChaos
     {
       edition: editionPDA,
       metadata: metadataPDA,
@@ -109,6 +110,7 @@ export const mintNFT = async ({
       masterEditionTx,
     ],
     wallet,
+    feePayer: feePayer === undefined ? wallet.publicKey : feePayer // MrChaos
   });
 
   return {

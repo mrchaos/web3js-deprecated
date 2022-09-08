@@ -1,4 +1,4 @@
-import { Keypair, SendOptions } from '@solana/web3.js';
+import { Keypair, PublicKey, SendOptions } from '@solana/web3.js';
 import { Wallet } from '../wallet';
 import { Connection } from '../Connection';
 import { Transaction } from '@metaplex-foundation/mpl-core';
@@ -10,6 +10,7 @@ export interface SendTransactionParams {
   txs: Transaction[];
   signers?: Keypair[];
   options?: SendOptions;
+  feePayer?: PublicKey;
 }
 
 /**
@@ -22,8 +23,9 @@ export const sendTransaction = async ({
   txs,
   signers = [],
   options,
+  feePayer // MrChaos
 }: SendTransactionParams): Promise<string> => {
-  let tx = Transaction.fromCombined(txs, { feePayer: wallet.publicKey });
+  let tx = Transaction.fromCombined(txs, { feePayer: feePayer === undefined ? wallet.publicKey : feePayer});  // MrChaos
   tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
 
   if (signers.length) {

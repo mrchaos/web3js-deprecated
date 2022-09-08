@@ -21,6 +21,8 @@ export interface CreateMasterEditionParams {
    **/
   updateAuthority?: PublicKey;
   maxSupply?: BN;
+  // Added MrChaos
+  feePayer?: PublicKey;
 }
 
 /**
@@ -32,13 +34,13 @@ export interface CreateMasterEditionParams {
  * @return This action returns the resulting transaction id once it has been executed
  */
 export const createMasterEdition = async (
-  { connection, wallet, editionMint, updateAuthority, maxSupply } = {} as CreateMasterEditionParams,
+  { connection, wallet, editionMint, updateAuthority, maxSupply,feePayer } = {} as CreateMasterEditionParams,
 ): Promise<string> => {
   const metadata = await Metadata.getPDA(editionMint);
   const edition = await MasterEdition.getPDA(editionMint);
 
   const createMetadataTx = new CreateMasterEdition(
-    { feePayer: wallet.publicKey },
+    { feePayer: feePayer===undefined ? wallet.publicKey : feePayer }, // add feepayer by MrChaos
     {
       edition,
       metadata,
