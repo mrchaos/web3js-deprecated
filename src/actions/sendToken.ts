@@ -19,6 +19,7 @@ export interface SendTokenParams {
   mint: PublicKey;
   /** Amount of tokens to transfer. One important nuance to remember is that each token mint has a different amount of decimals, which need to be accounted while specifying the amount. For instance, to send 1 token with a 0 decimal mint you would provide `1` as the amount, but for a token mint with 6 decimals you would provide `1000000` as the amount to transfer one whole token **/
   amount: number | u64;
+  feePayer?: PublicKey;  // MrChaos
 }
 
 export interface SendTokenResponse {
@@ -42,6 +43,7 @@ export const sendToken = async ({
   destination,
   mint,
   amount,
+  feePayer,
 }: SendTokenParams): Promise<SendTokenResponse> => {
   const txs = [];
   const destAta = await Token.getAssociatedTokenAddress(
@@ -51,9 +53,8 @@ export const sendToken = async ({
     destination,
   );
   const transactionCtorFields = {
-    feePayer: wallet.publicKey,
-  };
-
+    feePayer: feePayer ?? wallet.publicKey, // MrChaos
+  };  
   try {
     // check if the account exists
     await Account.load(connection, destAta);
@@ -63,6 +64,7 @@ export const sendToken = async ({
         associatedTokenAddress: destAta,
         splTokenMintAddress: mint,
         walletAddress: destination,
+        feePayer: feePayer ?? wallet.publicKey, // MrChaos
       }),
     );
   }
@@ -80,7 +82,7 @@ export const sendToken = async ({
     ),
   );
 
-  const txId = await sendTransaction({ connection, wallet, txs });
+  const txId = await sendTransaction({ connection, wallet, txs, feePayer:feePayer }); // MrChaos
 
   return { txId };
 };

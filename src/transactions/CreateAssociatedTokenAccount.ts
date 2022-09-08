@@ -13,6 +13,7 @@ type CreateAssociatedTokenAccountParams = {
   associatedTokenAddress: PublicKey;
   walletAddress?: PublicKey;
   splTokenMintAddress: PublicKey;
+  feePayer?: PublicKey; // MrChaos
 };
 
 export class CreateAssociatedTokenAccount extends Transaction {

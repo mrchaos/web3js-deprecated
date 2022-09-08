@@ -77,7 +77,7 @@ export const mintNFT = async ({
   });
 
   const createMetadataTx = new CreateMetadata(
-    { feePayer: feePayer === undefined ? wallet.publicKey : feePayer }, // MrChaos
+    { feePayer: feePayer ?? wallet.publicKey }, // MrChaos
     {
       metadata: metadataPDA,
       metadataData,
@@ -88,7 +88,7 @@ export const mintNFT = async ({
   );
 
   const masterEditionTx = new CreateMasterEdition(
-    { feePayer: feePayer === undefined ? wallet.publicKey : feePayer }, // MrChaos
+    { feePayer: feePayer ?? wallet.publicKey }, // MrChaos
     {
       edition: editionPDA,
       metadata: metadataPDA,
@@ -109,8 +109,8 @@ export const mintNFT = async ({
       mintToTx,
       masterEditionTx,
     ],
-    wallet,
-    feePayer: feePayer === undefined ? wallet.publicKey : feePayer // MrChaos
+    feePayer: feePayer ?? wallet.publicKey, // MrChaos
+    wallet,    
   });
 
   return {

@@ -10,7 +10,7 @@ export interface SendTransactionParams {
   txs: Transaction[];
   signers?: Keypair[];
   options?: SendOptions;
-  feePayer?: PublicKey;
+  feePayer?: PublicKey;  //MrChaos
 }
 
 /**
@@ -25,13 +25,30 @@ export const sendTransaction = async ({
   options,
   feePayer // MrChaos
 }: SendTransactionParams): Promise<string> => {
-  let tx = Transaction.fromCombined(txs, { feePayer: feePayer === undefined ? wallet.publicKey : feePayer});  // MrChaos
+  let tx = Transaction.fromCombined(txs, { feePayer: feePayer ?? wallet.publicKey});  // MrChaos
   tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
 
   if (signers.length) {
     tx.partialSign(...signers);
   }
   tx = await wallet.signTransaction(tx);
+  console.log("********* web3j-deprecated:sendTransaction - before sendRawTransaction");
+  console.log("********* web3j-deprecated:sendTransaction - before sendRawTransaction : signers");
+  signers.forEach(signer => {
+    console.log("Signer : ",signer.publicKey.toBase58());
+  });
+  tx.signatures.forEach(signature => {
+    console.log("Signer Of TX : ",signature.publicKey.toBase58());
+  });
+  console.log("********* web3j-deprecated:sendTransaction - before sendRawTransaction - Instructions");  
+  tx.instructions.forEach(ins => {
+    console.log("******************* Ins Program:",ins.programId.toBase58());
+    ins.keys.forEach(k => {
+      console.log("Key : ",k.pubkey.toBase58(),", isSigner : ",k.isSigner, ", isWrite : ", k.isWritable);
+    });
+  });
 
+  console.log("********* web3j-deprecated:sendTransaction - before sendRawTransaction : verify signature=",tx.verifySignatures());
+  
   return connection.sendRawTransaction(tx.serialize(), options);
 };

@@ -40,7 +40,7 @@ export const createMasterEdition = async (
   const edition = await MasterEdition.getPDA(editionMint);
 
   const createMetadataTx = new CreateMasterEdition(
-    { feePayer: feePayer===undefined ? wallet.publicKey : feePayer }, // add feepayer by MrChaos
+    { feePayer: feePayer ?? wallet.publicKey }, // add feepayer by MrChaos
     {
       edition,
       metadata,

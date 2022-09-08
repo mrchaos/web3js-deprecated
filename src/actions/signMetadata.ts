@@ -14,6 +14,7 @@ export interface SignMetadataParams {
   editionMint: PublicKey;
   /** An optional signer. If specified, the signer address must be included in the `creators` array on the {@link Metadata} account data **/
   signer?: Keypair;
+  feePayer?: PublicKey;  // MrChaos
 }
 
 /**
@@ -21,11 +22,11 @@ export interface SignMetadataParams {
  * @return This action returns the resulting transaction id once it has been executed
  */
 export const signMetadata = async (
-  { connection, wallet, editionMint, signer } = {} as SignMetadataParams,
+  { connection, wallet, editionMint, signer, feePayer } = {} as SignMetadataParams,
 ): Promise<string> => {
   const metadata = await Metadata.getPDA(editionMint);
   const signTx = new SignMetadata(
-    { feePayer: wallet.publicKey },
+    {feePayer: feePayer ?? wallet.publicKey }, // MrChaos
     {
       metadata,
       creator: signer ? signer.publicKey : wallet.publicKey,
@@ -35,6 +36,7 @@ export const signMetadata = async (
     connection,
     signers: signer ? [signer] : [],
     txs: [signTx],
-    wallet,
+    feePayer:feePayer,  // MrChaos
+    wallet,    
   });
 };

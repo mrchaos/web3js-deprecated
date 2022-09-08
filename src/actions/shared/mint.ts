@@ -25,7 +25,7 @@ export async function prepareTokenAccountAndMintTxs(
   const mint = Keypair.generate();
   const mintRent = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
   const createMintTx = new CreateMint(
-    { feePayer: feePayer===undefined ? owner : feePayer },
+    { feePayer: feePayer ?? owner}, // MrChaos
     {
       newAccountPubkey: mint.publicKey,
       lamports: mintRent,
@@ -40,7 +40,7 @@ export async function prepareTokenAccountAndMintTxs(
   );
 
   const createAssociatedTokenAccountTx = new CreateAssociatedTokenAccount(
-    { feePayer: feePayer===undefined ? owner : feePayer },
+    { feePayer: feePayer ?? owner },
     {
       associatedTokenAddress: recipient,
       splTokenMintAddress: mint.publicKey,
@@ -48,7 +48,7 @@ export async function prepareTokenAccountAndMintTxs(
   );
 
   const mintToTx = new MintTo(
-    { feePayer: feePayer===undefined ? owner : feePayer },
+    { feePayer: feePayer ?? owner},
     {
       mint: mint.publicKey,
       dest: recipient,

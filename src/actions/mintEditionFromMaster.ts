@@ -18,6 +18,7 @@ export interface MintEditionFromMasterParams {
   wallet: Wallet;
   masterEditionMint: PublicKey;
   updateAuthority?: PublicKey;
+  feePayer? : PublicKey;
 }
 
 export interface MintEditionFromMasterResponse {
@@ -28,7 +29,7 @@ export interface MintEditionFromMasterResponse {
 }
 
 export const mintEditionFromMaster = async (
-  { connection, wallet, masterEditionMint, updateAuthority } = {} as MintEditionFromMasterParams,
+  { connection, wallet, masterEditionMint, updateAuthority,feePayer } = {} as MintEditionFromMasterParams, // MrChaos
 ): Promise<MintEditionFromMasterResponse> => {
   const masterPDA = await MasterEdition.getPDA(masterEditionMint);
   const masterMetaPDA = await Metadata.getPDA(masterEditionMint);
@@ -38,8 +39,11 @@ export const mintEditionFromMaster = async (
   //take the current outstanding supply and increment by 1
   const editionValue = masterData.supply.add(new BN(1));
 
-  const { mint, createMintTx, createAssociatedTokenAccountTx, mintToTx } =
-    await prepareTokenAccountAndMintTxs(connection, wallet.publicKey);
+  const { mint, createMintTx, createAssociatedTokenAccountTx, mintToTx } = 
+  (feePayer === undefined || feePayer == null) ? 
+      await prepareTokenAccountAndMintTxs(connection, wallet.publicKey)
+      : await prepareTokenAccountAndMintTxs(connection, wallet.publicKey,feePayer); // MrChaos
+
 
   const tokenAccount = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -53,7 +57,7 @@ export const mintEditionFromMaster = async (
   const editionPDA = await Edition.getPDA(mint.publicKey);
 
   const newEditionFromMasterTx = new MintNewEditionFromMasterEditionViaToken(
-    { feePayer: wallet.publicKey },
+    { feePayer: feePayer ?? wallet.publicKey },
     {
       edition: editionPDA, //empty, created inside program
       metadata: metadataPDA, //empty, created inside program
@@ -73,6 +77,7 @@ export const mintEditionFromMaster = async (
     connection,
     signers: [mint],
     txs: [createMintTx, createAssociatedTokenAccountTx, mintToTx, newEditionFromMasterTx],
+    feePayer: feePayer, // MrChaos
     wallet,
   });
 
