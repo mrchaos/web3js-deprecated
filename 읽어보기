@@ -1,0 +1,5 @@
+build전에 버전을 높인다
+build : npm run build
+npm package 만들기:
+npm login
+npm publish
