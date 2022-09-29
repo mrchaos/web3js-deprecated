@@ -23,7 +23,7 @@ export class MintTo extends Transaction {
         mint,
         dest,
         authority ?? feePayer,
-        [],
+        [], // MrChaos : Signer들을 추가 해야 하나 ? 예) feepayer, authority
         new BN(amount).toNumber(),
       ),
     );

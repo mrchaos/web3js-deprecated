@@ -29,6 +29,9 @@ export async function prepareTokenAccountAndMintTxs(
     {
       newAccountPubkey: mint.publicKey,
       lamports: mintRent,
+      decimals: 0, // MrChaos
+      owner: owner,  // MrChaos
+      freezeAuthority: owner // MrChaos
     },
   );
 
@@ -43,6 +46,7 @@ export async function prepareTokenAccountAndMintTxs(
     { feePayer: feePayer ?? owner },
     {
       associatedTokenAddress: recipient,
+      walletAddress: owner,  // MrChaos
       splTokenMintAddress: mint.publicKey,
     },
   );
@@ -52,6 +56,7 @@ export async function prepareTokenAccountAndMintTxs(
     {
       mint: mint.publicKey,
       dest: recipient,
+      authority: owner, // MrChaos
       amount: 1,
     },
   );

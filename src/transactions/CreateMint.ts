@@ -31,10 +31,19 @@ export class CreateMint extends Transaction {
       Token.createInitMintInstruction(
         TOKEN_PROGRAM_ID,
         newAccountPubkey,
-        decimals ?? 0,
-        owner ?? feePayer,
-        freezeAuthority ?? feePayer,
+        decimals,
+        owner,  // MrChaos
+        freezeAuthority, // MrChaos
       ),
     );
+    // this.add(
+    //   Token.createInitMintInstruction(
+    //     TOKEN_PROGRAM_ID,
+    //     newAccountPubkey,
+    //     decimals ?? 0,
+    //     owner ?? feePayer,
+    //     freezeAuthority ?? feePayer,
+    //   ),
+    // );    
   }
 }
